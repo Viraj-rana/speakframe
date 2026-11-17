@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+*.pckl
+
+# Large model weights (download via README)
+weight/*.model
+model/faceDetector/s3fd/sfd_face.pth
+
+# Demo artifacts
+demo/sample/
+demo/uploads/
+demo_runs/
+exps/
+
+# OS
+.DS_Store
+Thumbs.db

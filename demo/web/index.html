@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SpeakFrame</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <h1>SpeakFrame</h1>
+        <p class="muted">See who is speaking in your video</p>
+      </div>
+      <span id="device" class="badge">…</span>
+    </header>
+
+    <main class="layout">
+      <section class="card">
+        <h2>Upload</h2>
+        <p class="muted">MP4 with faces and speech. Short clips (5–15s) work better on CPU.</p>
+
+        <label class="field">
+          <span>Video file</span>
+          <input type="file" id="file" accept="video/*" />
+        </label>
+
+        <label class="field">
+          <span>Duration (seconds)</span>
+          <input type="number" id="duration" value="10" min="3" max="60" />
+        </label>
+
+        <button type="button" id="run" class="primary">Analyze</button>
+
+        <div id="status" class="log" aria-live="polite"></div>
+        <progress id="bar" value="0" max="100" hidden></progress>
+      </section>
+
+      <section class="card">
+        <h2>Preview</h2>
+        <video id="player" controls playsinline></video>
+        <p id="caption" class="muted">Green box = speaking · Gray/red = not speaking</p>
+      </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+torch
+torchvision
+opencv-python
+numpy
+scipy
+scikit-learn
+tqdm
+pandas
+python_speech_features
+scenedetect==0.6.4
+opencv-python
+fastapi
+uvicorn[standard]
+python-multipart
+gdown
