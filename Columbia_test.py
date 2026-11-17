@@ -21,6 +21,10 @@ warnings.filterwarnings("ignore")
 def asd_device():
 	return "cuda" if torch.cuda.is_available() else "cpu"
 
+def q(path):
+	"""Quote a path for cmd.exe so spaces (e.g. 'Good boy') are not split."""
+	return '"' + str(path).replace('"', '') + '"'
+
 parser = argparse.ArgumentParser(description = "Columbia ASD Evaluation")
 
 parser.add_argument('--videoName',             type=str, default="col",   help='Demo video name')
@@ -188,11 +192,11 @@ def crop_video(args, track, cropFile):
 	audioEnd    = (track['frame'][-1]+1) / 25
 	vOut.release()
 	command = ("ffmpeg -y -i %s -async 1 -ac 1 -vn -acodec pcm_s16le -ar 16000 -threads %d -ss %.3f -to %.3f %s -loglevel panic" % \
-		      (args.audioFilePath, args.nDataLoaderThread, audioStart, audioEnd, audioTmp)) 
+		      (q(args.audioFilePath), args.nDataLoaderThread, audioStart, audioEnd, q(audioTmp))) 
 	output = subprocess.call(command, shell=True, stdout=None) # Crop audio file
 	_, audio = wavfile.read(audioTmp)
-	command = ("ffmpeg -y -i %st.avi -i %s -threads %d -c:v copy -c:a copy %s.avi -loglevel panic" % \
-			  (cropFile, audioTmp, args.nDataLoaderThread, cropFile)) # Combine audio and video file
+	command = ("ffmpeg -y -i %s -i %s -threads %d -c:v copy -c:a copy %s -loglevel panic" % \
+			  (q(cropFile + "t.avi"), q(audioTmp), args.nDataLoaderThread, q(cropFile + ".avi"))) # Combine audio and video file
 	output = subprocess.call(command, shell=True, stdout=None)
 	os.remove(cropFile + 't.avi')
 	return {'track':track, 'proc_track':dets}
@@ -277,12 +281,12 @@ def visualization(tracks, scores, args):
 	video_out_avi = os.path.join(args.pyaviPath, 'video_out.avi')
 	video_out_mp4 = os.path.join(args.pyaviPath, 'video_out.mp4')
 	command = ("ffmpeg -y -i %s -i %s -threads %d -c:v libx264 -preset fast -crf 23 -c:a aac %s -loglevel panic" % \
-		(os.path.join(args.pyaviPath, 'video_only.avi'), os.path.join(args.pyaviPath, 'audio.wav'), \
-		args.nDataLoaderThread, video_out_mp4))
+		(q(os.path.join(args.pyaviPath, 'video_only.avi')), q(os.path.join(args.pyaviPath, 'audio.wav')), \
+		args.nDataLoaderThread, q(video_out_mp4)))
 	subprocess.call(command, shell=True, stdout=None)
 	command = ("ffmpeg -y -i %s -i %s -threads %d -c:v copy -c:a copy %s -loglevel panic" % \
-		(os.path.join(args.pyaviPath, 'video_only.avi'), os.path.join(args.pyaviPath, 'audio.wav'), \
-		args.nDataLoaderThread, video_out_avi))
+		(q(os.path.join(args.pyaviPath, 'video_only.avi')), q(os.path.join(args.pyaviPath, 'audio.wav')), \
+		args.nDataLoaderThread, q(video_out_avi)))
 	subprocess.call(command, shell=True, stdout=None)
 
 def evaluate_col_ASD(tracks, scores, args):
@@ -396,23 +400,23 @@ def main():
 	# If duration did not set, extract the whole video, otherwise extract the video from 'args.start' to 'args.start + args.duration'
 	if args.duration == 0:
 		command = ("ffmpeg -y -i %s -qscale:v 2 -threads %d -async 1 -r 25 %s -loglevel panic" % \
-			(args.videoPath, args.nDataLoaderThread, args.videoFilePath))
+			(q(args.videoPath), args.nDataLoaderThread, q(args.videoFilePath)))
 	else:
 		command = ("ffmpeg -y -i %s -qscale:v 2 -threads %d -ss %.3f -to %.3f -async 1 -r 25 %s -loglevel panic" % \
-			(args.videoPath, args.nDataLoaderThread, args.start, args.start + args.duration, args.videoFilePath))
+			(q(args.videoPath), args.nDataLoaderThread, args.start, args.start + args.duration, q(args.videoFilePath)))
 	subprocess.call(command, shell=True, stdout=None)
 	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Extract the video and save in %s \r\n" %(args.videoFilePath))
 	
 	# Extract audio
 	args.audioFilePath = os.path.join(args.pyaviPath, 'audio.wav')
 	command = ("ffmpeg -y -i %s -qscale:a 0 -ac 1 -vn -threads %d -ar 16000 %s -loglevel panic" % \
-		(args.videoFilePath, args.nDataLoaderThread, args.audioFilePath))
+		(q(args.videoFilePath), args.nDataLoaderThread, q(args.audioFilePath)))
 	subprocess.call(command, shell=True, stdout=None)
 	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Extract the audio and save in %s \r\n" %(args.audioFilePath))
 
 	# Extract the video frames
 	command = ("ffmpeg -y -i %s -qscale:v 2 -threads %d -f image2 %s -loglevel panic" % \
-		(args.videoFilePath, args.nDataLoaderThread, os.path.join(args.pyframesPath, '%06d.jpg'))) 
+		(q(args.videoFilePath), args.nDataLoaderThread, q(os.path.join(args.pyframesPath, '%06d.jpg')))) 
 	subprocess.call(command, shell=True, stdout=None)
 	sys.stderr.write(time.strftime("%Y-%m-%d %H:%M:%S") + " Extract the frames and save in %s \r\n" %(args.pyframesPath))
 
