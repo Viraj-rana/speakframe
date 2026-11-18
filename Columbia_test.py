@@ -54,7 +54,6 @@ if args.evalCol == True:
 	#                 4. active speaker detection for the detected face clips
 	#                 5. use iou to find the identity of each face clips, compute the F1 results
 	# The step 1 to 3 will take some time (That is one-time process). It depends on your cpu and gpu speed. For reference, I used 1.5 hour
-	# The step 4 and 5 need less than 10 minutes
 	# Need about 20G space finally
 	# ```
 	args.videoName = 'col'
