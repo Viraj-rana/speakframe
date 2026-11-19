@@ -44,4 +44,3 @@ python Columbia_test.py --videoName 0001 --videoFolder demo --pretrainModel weig
 }
 ```
 
-Thanks to [TalkNet-ASD](https://github.com/TaoRuijie/TalkNet-ASD).
