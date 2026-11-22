@@ -69,7 +69,6 @@ class ASD(nn.Module):
                 _, predScore, _, _ = self.lossAV.forward(outsAV, labels)    
                 predScore = predScore[:,1].detach().cpu().numpy()
                 predScores.extend(predScore)
-                # break
         evalLines = open(evalOrig).read().splitlines()[1:]
         labels = []
         labels = pandas.Series( ['SPEAKING_AUDIBLE' for line in evalLines])
