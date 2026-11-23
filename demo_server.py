@@ -85,7 +85,7 @@ def _run_pipeline(job_id: str, video_path: Path, duration: int) -> None:
         job["result_url"] = f"/api/result/{job_id}"
         LATEST_RESULT["mp4"] = str(dest)
         LATEST_RESULT["job_id"] = job_id
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:  # BLE001
         job["status"] = "error"
         job["message"] = str(exc)
 
